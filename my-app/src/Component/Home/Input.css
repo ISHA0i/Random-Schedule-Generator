@@ -1,0 +1,15 @@
+.input-container {
+    margin-top: 20px; /* Space above the input section */
+    padding: 20px; /* Padding around the input section */
+    border: 1px solid #ccc; /* Light border around the input section */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background color */
+}
+
+.input-container input {
+    margin-bottom: 10px; /* Space between input fields */
+}
+
+.input-container button {
+    margin-top: 10px; /* Space above the button */
+}

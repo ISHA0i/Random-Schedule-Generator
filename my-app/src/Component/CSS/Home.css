@@ -1,0 +1,18 @@
+.home-container {
+    text-align: center; /* Center align text */
+    padding: 20px; /* Add padding around the container */
+    background-color: #f0f8ff; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.home-title {
+    font-size: 2.5rem; /* Larger font size for the title */
+    color: #333; /* Dark color for the title */
+}
+
+.home-description {
+    font-size: 1.2rem; /* Medium font size for the description */
+    color: #666; /* Lighter color for the description */
+}
+

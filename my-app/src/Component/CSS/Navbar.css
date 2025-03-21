@@ -1,0 +1,22 @@
+.navbar {
+    background-color: #f8f9fa; /* Light background color */
+}
+
+.navbar-brand {
+    font-size: 1.5rem; /* Larger font size for the brand */
+    font-weight: bold; /* Bold font for the brand */
+}
+
+.nav-link {
+    color: #007bff; /* Bootstrap primary color */
+    margin-right: 15px; /* Space between links */
+}
+
+.nav-link:hover {
+    color: #0056b3; /* Darker color on hover */
+    text-decoration: underline; /* Underline on hover */
+}
+
+.nav-item {
+    margin: 0 10px; /* Space between nav items */
+}
