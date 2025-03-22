@@ -1,25 +1,34 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './Component/Navbar';
-import Home from './Component/Home';
+import Input from './Component/Home/Input';
 import Output from './Component/Detail/Output';
-import { generateTimetable } from './Component/controlles/Generatetimetable';
 
 function App() {
-  const [timetableData, setTimetableData] = useState([]); // State to hold timetable data
+  const [timetableData, setTimetableData] = useState([]);
+
+  // Load timetable data from localStorage on page load
+  useEffect(() => {
+    const savedData = localStorage.getItem('timetableData');
+    if (savedData) {
+      setTimetableData(JSON.parse(savedData));
+    }
+  }, []);
 
   // Handle timetable generation
   const handleGenerateTimetable = (data) => {
-    const timetable = generateTimetable(data);
-    setTimetableData(timetable);
+    console.log("Setting timetable data in App.js:", data);
+    setTimetableData(data);
+    localStorage.setItem('timetableData', JSON.stringify(data));
   };
 
   return (
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home onGenerate={handleGenerateTimetable} />} />
-        <Route path="/detail" element={<Output timetableData={timetableData} />} />
+        <Route path="/" element={<Navigate to="/input" />} />
+        <Route path="/input" element={<Input onGenerate={handleGenerateTimetable} />} />
+        <Route path="/output" element={<Output timetableData={timetableData} />} />
       </Routes>
     </Router>
   );
