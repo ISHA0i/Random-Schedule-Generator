@@ -29,7 +29,7 @@ function Output() {
     return <div className="loading">Loading timetable data...</div>;
   }
 
-  const { schedule, stats } = timetableData;
+  const { schedule, stats, freeSlots } = timetableData;
 
   // Check if schedule is defined
   if (!schedule) {
@@ -51,6 +51,20 @@ function Output() {
       displayRows.push(row);
     }
   });
+
+  // Format free slots for display
+  const formatFreeSlots = () => {
+    if (!freeSlots) return "None";
+    
+    const formattedSlots = [];
+    for (const [day, slots] of Object.entries(freeSlots)) {
+      if (slots && slots.length > 0) {
+        formattedSlots.push(`${day}: ${slots.join(', ')}`);
+      }
+    }
+    
+    return formattedSlots.length > 0 ? formattedSlots.join(' | ') : "None";
+  };
 
   return (
     <div className="output-container">
@@ -80,17 +94,22 @@ function Output() {
                 // Render regular row
                 <tr key={rowIndex}>
                   <td>{row.time}</td>
-                  <td>{row.MON}</td>
-                  <td>{row.TUE}</td>
-                  <td>{row.WED}</td>
-                  <td>{row.THU}</td>
-                  <td>{row.FRI}</td>
-                  <td>{row.SAT}</td>
+                  <td className={row.MON === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.MON === 'FREE SLOT' ? 'FREE SLOT' : row.MON}</td>
+                  <td className={row.TUE === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.TUE === 'FREE SLOT' ? 'FREE SLOT' : row.TUE}</td>
+                  <td className={row.WED === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.WED === 'FREE SLOT' ? 'FREE SLOT' : row.WED}</td>
+                  <td className={row.THU === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.THU === 'FREE SLOT' ? 'FREE SLOT' : row.THU}</td>
+                  <td className={row.FRI === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.FRI === 'FREE SLOT' ? 'FREE SLOT' : row.FRI}</td>
+                  <td className={row.SAT === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.SAT === 'FREE SLOT' ? 'FREE SLOT' : row.SAT}</td>
                 </tr>
               )
             ))}
           </tbody>
         </table>
+        
+        <div className="free-slots-summary">
+          <h3>Free Slots</h3>
+          <p>{formatFreeSlots()}</p>
+        </div>
       </div>
       
       {stats && <TimetableStats stats={stats} />}

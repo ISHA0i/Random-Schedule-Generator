@@ -123,4 +123,53 @@
 .days-selection,
 .slots-selection {
   margin-top: 15px;
+}
+
+/* Add these styles for free slots section */
+.free-slots-section {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  border: 1px solid #e0e0e0;
+}
+
+.free-slots-section h3 {
+  color: #2196f3;
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #2196f3;
+  padding-bottom: 10px;
+}
+
+.day-checkbox {
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.day-checkbox h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #424242;
+}
+
+.day-checkbox label {
+  display: inline-flex;
+  align-items: center;
+  width: 150px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.day-checkbox input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
 } 

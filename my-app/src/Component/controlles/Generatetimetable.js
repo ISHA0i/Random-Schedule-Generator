@@ -25,6 +25,7 @@ class TimetableStats {
     this.totalSlots = 0;
     this.usedSlots = 0;
     this.breakSlots = 0;
+    this.freeSlots = 0;  // Add a dedicated counter for free slots
   }
 
   // Update faculty statistics
@@ -95,10 +96,14 @@ class TimetableStats {
 
   // Get overall statistics
   getOverallStats() {
+    const availableSlots = this.totalSlots - this.breakSlots;
+    const usedForClasses = this.usedSlots - this.freeSlots; // Subtract free slots from used
+    
     return {
-      totalSlots: this.totalSlots,
-      usedSlots: this.usedSlots,
-      freeSlots: this.totalSlots - this.usedSlots - this.breakSlots,
+      totalSlots: availableSlots, // Total slots excluding breaks
+      usedSlots: usedForClasses, // Slots used for actual classes
+      freeSlots: this.freeSlots, // Free slots explicitly marked as free
+      availableSlots: availableSlots - usedForClasses - this.freeSlots, // Remaining available slots
       breakSlots: this.breakSlots
     };
   }
@@ -106,14 +111,16 @@ class TimetableStats {
 
 // Class to handle schedule logic
 class Schedule {
-  constructor(daysOfWeek, timeSlots, visitingFaculty = []) {
+  constructor(daysOfWeek, timeSlots, visitingFaculty = [], freeSlots = {}) {
     this.daysOfWeek = daysOfWeek;
     this.timeSlots = timeSlots;
     this.visitingFaculty = visitingFaculty;
+    this.freeSlots = freeSlots;
     this.stats = new TimetableStats();
     this.stats.totalSlots = daysOfWeek.length * timeSlots.length;
     this.schedule = this.initializeSchedule();
     this.assignVisitingFaculty();
+    this.markFreeSlots();
   }
 
   // Initialize an empty schedule
@@ -134,12 +141,29 @@ class Schedule {
     
     // Update the stats after counting
     this.stats.breakSlots = breakCount;
-    this.stats.totalSlots = this.daysOfWeek.length * this.timeSlots.length - breakCount;
+    this.stats.totalSlots = this.daysOfWeek.length * this.timeSlots.length;
     
     return schedule;
   }
 
-  // Get available slots for assigning, excluding breaks
+  // Mark free slots in the schedule
+  markFreeSlots() {
+    if (!this.freeSlots) return;
+    
+    this.daysOfWeek.forEach((day) => {
+      if (this.freeSlots[day]) {
+        this.freeSlots[day].forEach((freeSlotTime) => {
+          const slotIndex = this.timeSlots.findIndex(slot => slot === freeSlotTime);
+          if (slotIndex !== -1 && this.schedule[day][slotIndex] === '-') {
+            this.schedule[day][slotIndex] = 'FREE';
+            this.stats.usedSlots++; // Count free slots as used
+          }
+        });
+      }
+    });
+  }
+
+  // Get available slots for assigning, excluding breaks and free slots
   getAvailableSlots() {
     const availableSlots = [];
     this.daysOfWeek.forEach((day) => {
@@ -285,7 +309,8 @@ export const generateTimetable = ({
   facultyNames = [], 
   hasLab = [], 
   lectureCount = [],
-  visitingFaculty = []
+  visitingFaculty = [],
+  freeSlots = {}
 }) => {
   const daysOfWeek = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const timeSlots = [
@@ -304,6 +329,7 @@ export const generateTimetable = ({
   console.log('Has Lab:', hasLab);
   console.log('Lecture Count:', lectureCount);
   console.log('Visiting Faculty:', visitingFaculty);
+  console.log('Free Slots:', freeSlots);
 
   // Create subject objects with details
   const subjectObjects = subjects.map(
@@ -316,7 +342,7 @@ export const generateTimetable = ({
   );
 
   // Initialize schedule and assign subjects
-  const schedule = new Schedule(daysOfWeek, timeSlots, visitingFaculty);
+  const schedule = new Schedule(daysOfWeek, timeSlots, visitingFaculty, freeSlots);
   schedule.assignSubjects(subjectObjects);
 
   // Get statistics

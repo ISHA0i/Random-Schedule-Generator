@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../CSS/SubjectForm.css';
 
 const SubjectForm = ({ onSubmit }) => {
-  // Initial time slots without breaks
+  // Initial time slots to match the ones used in Generatetimetable.js
   const timeSlots = [
     '07:30 to 8:25',
     '08:25 to 9:20',
@@ -24,6 +24,15 @@ const SubjectForm = ({ onSubmit }) => {
     visitingDays: [],
     visitingSlots: []
   })));
+
+  const [freeSlots, setFreeSlots] = useState({
+    MON: [],
+    TUE: [],
+    WED: [],
+    THU: [],
+    FRI: [],
+    SAT: []
+  });
 
   // Add a new subject
   const addSubject = () => {
@@ -104,6 +113,30 @@ const SubjectForm = ({ onSubmit }) => {
     setSubjectData(newSubjectData);
   };
 
+  // Handle free slot selection
+  const toggleFreeSlot = (day, slot) => {
+    setFreeSlots(prev => {
+      const currentSlots = prev[day];
+      if (currentSlots.includes(slot)) {
+        return { ...prev, [day]: currentSlots.filter(s => s !== slot) };
+      } else {
+        return { ...prev, [day]: [...currentSlots, slot] };
+      }
+    });
+  };
+
+  // Toggle all slots for a day
+  const toggleAllSlotsForDay = (day) => {
+    setFreeSlots(prev => {
+      const currentSlots = prev[day];
+      if (currentSlots.length === timeSlots.length) {
+        return { ...prev, [day]: [] };
+      } else {
+        return { ...prev, [day]: [...timeSlots] };
+      }
+    });
+  };
+
   // Format data and submit
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -114,7 +147,8 @@ const SubjectForm = ({ onSubmit }) => {
       facultyNames: subjectData.map(subject => subject.facultyNames),
       hasLab: subjectData.map(subject => subject.hasLab),
       lectureCount: subjectData.map(subject => subject.lectureCount),
-      visitingFaculty: []
+      visitingFaculty: [],
+      freeSlots: freeSlots // Make sure this is included
     };
 
     // Add visiting faculty information
@@ -133,6 +167,7 @@ const SubjectForm = ({ onSubmit }) => {
       }
     });
 
+    console.log("Formatted data:", formattedData); // Debug
     onSubmit(formattedData);
   };
 
@@ -279,6 +314,40 @@ const SubjectForm = ({ onSubmit }) => {
           </div>
         ))}
         
+        {/* Free Slots Section */}
+        <div className="free-slots-section">
+          <h3>Free Slots Configuration</h3>
+          <p>Select the time slots that should remain free (not scheduled)</p>
+          
+          {Object.keys(freeSlots).map(day => (
+            <div key={day} className="day-checkbox">
+              <div className="day-header">
+                <h4>{day}</h4>
+                <button 
+                  type="button" 
+                  className="select-all-btn" 
+                  onClick={() => toggleAllSlotsForDay(day)}
+                >
+                  {freeSlots[day].length === timeSlots.length ? 'Deselect All' : 'Select All'}
+                </button>
+              </div>
+              
+              <div className="checkbox-group">
+                {timeSlots.map(slot => (
+                  <label key={slot}>
+                    <input
+                      type="checkbox"
+                      checked={freeSlots[day].includes(slot)}
+                      onChange={() => toggleFreeSlot(day, slot)}
+                    />
+                    {slot}
+                  </label>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="form-actions">
           <button type="button" className="add-subject-btn" onClick={addSubject}>
             Add Subject
@@ -288,6 +357,9 @@ const SubjectForm = ({ onSubmit }) => {
           </button>
         </div>
       </form>
+      <div className="subject-count">
+        <p>Total subjects: {subjectCount}</p>
+      </div>
     </div>
   );
 };
