@@ -110,29 +110,31 @@ class Schedule {
     this.daysOfWeek = daysOfWeek;
     this.timeSlots = timeSlots;
     this.visitingFaculty = visitingFaculty;
-    this.schedule = this.initializeSchedule();
     this.stats = new TimetableStats();
-    
-    // Calculate total slots
     this.stats.totalSlots = daysOfWeek.length * timeSlots.length;
-    
-    // Assign visiting faculty first
+    this.schedule = this.initializeSchedule();
     this.assignVisitingFaculty();
   }
 
   // Initialize an empty schedule
   initializeSchedule() {
+    let breakCount = 0; // Track break count locally
     const schedule = {};
+    
     this.daysOfWeek.forEach((day) => {
       schedule[day] = this.timeSlots.map((slot) => {
         // Mark break slots as 'BREAK' to prevent assignments
         if (slot.includes('BREAK')) {
-          this.stats.breakSlots++;
+          breakCount++; // Increment local counter
           return 'BREAK';
         }
         return '-';
       });
     });
+    
+    // Update the stats after counting
+    this.stats.breakSlots = breakCount;
+    
     return schedule;
   }
 
@@ -320,7 +322,7 @@ export const generateTimetable = ({
   const stats = schedule.getStats();
 
   // Prepare timetable data for Output
-  const timetableData = {
+  return {
     schedule: timeSlots.map((timeSlot, index) => {
       const row = { time: timeSlot };
       daysOfWeek.forEach((day) => {
@@ -330,7 +332,5 @@ export const generateTimetable = ({
     }),
     stats: stats
   };
-
-  return timetableData;
 };
   
