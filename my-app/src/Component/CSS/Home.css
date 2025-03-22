@@ -16,3 +16,12 @@
     color: #666; /* Lighter color for the description */
 }
 
+/* Add hover effect for buttons */
+.btn {
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+

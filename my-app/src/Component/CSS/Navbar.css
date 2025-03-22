@@ -1,22 +1,61 @@
+/* Navbar container */
 .navbar {
-    background-color: #f8f9fa; /* Light background color */
+    background-color: #343a40; /* Dark background color */
+    padding: 0.5rem 1rem; /* Add some padding */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
+/* Brand styling */
 .navbar-brand {
-    font-size: 1.5rem; /* Larger font size for the brand */
+    font-size: 1.8rem; /* Larger font size for the brand */
     font-weight: bold; /* Bold font for the brand */
+    color: #ffffff; /* White color for the brand */
+    text-transform: uppercase; /* Uppercase text for the brand */
 }
 
+.navbar-brand:hover {
+    color: #ffc107; /* Gold color on hover */
+    text-decoration: none; /* Remove underline on hover */
+}
+
+/* Navigation links */
 .nav-link {
-    color: #007bff; /* Bootstrap primary color */
+    color: #ffffff; /* White color for links */
+    font-size: 1rem; /* Standard font size */
     margin-right: 15px; /* Space between links */
+    transition: color 0.3s ease; /* Smooth transition for hover effect */
 }
 
 .nav-link:hover {
-    color: #0056b3; /* Darker color on hover */
-    text-decoration: underline; /* Underline on hover */
+    color: #ffc107; /* Gold color on hover */
+    text-decoration: none; /* Remove underline on hover */
 }
 
-.nav-item {
-    margin: 0 10px; /* Space between nav items */
+/* Active link styling */
+.nav-link.active {
+    color: #ffc107; /* Gold color for active link */
+    font-weight: bold; /* Bold font for active link */
+}
+
+/* Navbar toggler (for mobile view) */
+.navbar-toggler {
+    border: none; /* Remove border */
+    background-color: #ffc107; /* Gold background for toggler */
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%28255, 255, 255, 1%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Adjust navbar for better responsiveness */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Stack items vertically */
+    }
+    .navbar-nav {
+        width: 100%; /* Full width for mobile */
+    }
+    .nav-item {
+        margin: 5px 0; /* Space between items */
+    }
 }
