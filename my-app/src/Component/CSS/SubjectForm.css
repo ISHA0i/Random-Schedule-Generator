@@ -1,0 +1,126 @@
+.subject-form-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.subject-card {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.checkbox label,
+.radio label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 15px;
+  font-weight: normal;
+}
+
+.checkbox input,
+.radio input {
+  margin-right: 5px;
+}
+
+.faculty-section,
+.visitor-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.faculty-input {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.faculty-input input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+  margin-bottom: 10px;
+  width: 120px;
+}
+
+.add-btn,
+.remove-btn,
+.add-subject-btn,
+.remove-subject-btn,
+.generate-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.remove-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.add-subject-btn {
+  background-color: #2196F3;
+  color: white;
+  margin-right: 10px;
+}
+
+.remove-subject-btn {
+  background-color: #ff9800;
+  color: white;
+  margin-top: 10px;
+}
+
+.generate-btn {
+  background-color: #673AB7;
+  color: white;
+  font-size: 16px;
+}
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.days-selection,
+.slots-selection {
+  margin-top: 15px;
+} 

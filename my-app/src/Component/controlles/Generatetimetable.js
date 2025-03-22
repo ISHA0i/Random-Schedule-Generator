@@ -134,6 +134,7 @@ class Schedule {
     
     // Update the stats after counting
     this.stats.breakSlots = breakCount;
+    this.stats.totalSlots = this.daysOfWeek.length * this.timeSlots.length - breakCount;
     
     return schedule;
   }

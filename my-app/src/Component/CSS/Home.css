@@ -4,6 +4,8 @@
     background-color: #f0f8ff; /* Light background color */
     border-radius: 8px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .home-title {
@@ -23,5 +25,15 @@
 
 .btn:hover {
     background-color: #0056b3; /* Darker blue on hover */
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+.timetable-section {
+    margin-top: 30px;
 }
 
