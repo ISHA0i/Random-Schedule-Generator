@@ -10,6 +10,8 @@ function Input({ onGenerate }) {
   const [facultyCounts, setFacultyCounts] = useState(Array(5).fill(1)); // Number of faculty for each subject
   const [facultyNames, setFacultyNames] = useState(Array.from({ length: 5 }, () => [])); // Fixed faculty names initialization
   const [hasLab, setHasLab] = useState(Array(5).fill(false)); // Lab for each subject
+  const [lectureCount, setLectureCount] = useState(Array(5).fill(2)); // Default 2 lectures per subject
+  const [visitingFaculty, setVisitingFaculty] = useState([]);
   const [additionalInfo, setAdditionalInfo] = useState('');
 
   // Handle change in subjects
@@ -46,6 +48,32 @@ function Input({ onGenerate }) {
     setHasLab(newHasLab);
   };
 
+  // Handle lecture count change
+  const handleLectureCountChange = (index, value) => {
+    const newLectureCount = [...lectureCount];
+    newLectureCount[index] = parseInt(value) || 1;
+    setLectureCount(newLectureCount);
+  };
+
+  // Add visiting faculty
+  const addVisitingFaculty = () => {
+    setVisitingFaculty([...visitingFaculty, { name: '', subject: '', day: 'MON', timeSlot: '09:50 to 10:45' }]);
+  };
+
+  // Remove visiting faculty
+  const removeVisitingFaculty = (index) => {
+    const newVisitingFaculty = [...visitingFaculty];
+    newVisitingFaculty.splice(index, 1);
+    setVisitingFaculty(newVisitingFaculty);
+  };
+
+  // Update visiting faculty info
+  const updateVisitingFaculty = (index, field, value) => {
+    const newVisitingFaculty = [...visitingFaculty];
+    newVisitingFaculty[index] = { ...newVisitingFaculty[index], [field]: value };
+    setVisitingFaculty(newVisitingFaculty);
+  };
+
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -54,6 +82,7 @@ function Input({ onGenerate }) {
     const filteredSubjects = subjects.filter(subject => subject.trim() !== '');
     const filteredFacultyNames = facultyNames.filter((_, index) => subjects[index].trim() !== '');
     const filteredHasLab = hasLab.filter((_, index) => subjects[index].trim() !== '');
+    const filteredLectureCount = lectureCount.filter((_, index) => subjects[index].trim() !== '');
     
     if (filteredSubjects.length === 0) {
       alert('Please enter at least one subject');
@@ -63,7 +92,9 @@ function Input({ onGenerate }) {
     const timetable = generateTimetable({ 
       subjects: filteredSubjects, 
       facultyNames: filteredFacultyNames.map(names => names.filter(name => name)), 
-      hasLab: filteredHasLab 
+      hasLab: filteredHasLab,
+      lectureCount: filteredLectureCount,
+      visitingFaculty: visitingFaculty
     });
     
     console.log('Generated Timetable:', timetable);
@@ -120,6 +151,17 @@ function Input({ onGenerate }) {
                   />
                 </label>
               ))}
+              <label>
+                Lectures per week:
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={lectureCount[index]}
+                  onChange={(e) => handleLectureCountChange(index, e.target.value)}
+                  className="lecture-count-field"
+                />
+              </label>
               <label className="lab-checkbox">
                 <input
                   type="checkbox"
@@ -128,6 +170,74 @@ function Input({ onGenerate }) {
                 />
                 Lab Included
               </label>
+            </div>
+          ))}
+        </div>
+
+        {/* Visiting Faculty Section */}
+        <div className="visiting-faculty-section">
+          <h3>Visiting Faculty</h3>
+          <button type="button" onClick={addVisitingFaculty} className="add-faculty-btn">
+            Add Visiting Faculty
+          </button>
+          
+          {visitingFaculty.map((faculty, index) => (
+            <div key={index} className="visiting-faculty-card">
+              <label>
+                Name:
+                <input
+                  type="text"
+                  value={faculty.name}
+                  onChange={(e) => updateVisitingFaculty(index, 'name', e.target.value)}
+                  className="faculty-field"
+                />
+              </label>
+              <label>
+                Subject:
+                <input
+                  type="text"
+                  value={faculty.subject}
+                  onChange={(e) => updateVisitingFaculty(index, 'subject', e.target.value)}
+                  className="faculty-field"
+                />
+              </label>
+              <label>
+                Day:
+                <select
+                  value={faculty.day}
+                  onChange={(e) => updateVisitingFaculty(index, 'day', e.target.value)}
+                  className="day-select"
+                >
+                  <option value="MON">Monday</option>
+                  <option value="TUE">Tuesday</option>
+                  <option value="WED">Wednesday</option>
+                  <option value="THU">Thursday</option>
+                  <option value="FRI">Friday</option>
+                  <option value="SAT">Saturday</option>
+                </select>
+              </label>
+              <label>
+                Time Slot:
+                <select
+                  value={faculty.timeSlot}
+                  onChange={(e) => updateVisitingFaculty(index, 'timeSlot', e.target.value)}
+                  className="time-select"
+                >
+                  <option value="07:30 to 8:25">07:30 to 8:25</option>
+                  <option value="08:25 to 9:20">08:25 to 9:20</option>
+                  <option value="09:50 to 10:45">09:50 to 10:45</option>
+                  <option value="10:45 to 11:40">10:45 to 11:40</option>
+                  <option value="11:50 to 12:45">11:50 to 12:45</option>
+                  <option value="12:45 to 1:40">12:45 to 1:40</option>
+                </select>
+              </label>
+              <button 
+                type="button" 
+                onClick={() => removeVisitingFaculty(index)}
+                className="remove-faculty-btn"
+              >
+                Remove
+              </button>
             </div>
           ))}
         </div>
