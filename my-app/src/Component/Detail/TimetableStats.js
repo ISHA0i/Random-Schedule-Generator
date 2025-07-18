@@ -1,81 +1,119 @@
 import React from 'react';
-import './TimetableStats.css';
+import { Card, Table, Row, Col, Statistic, Progress, Typography } from 'antd';
+
+const { Title } = Typography;
 
 function TimetableStats({ stats }) {
   if (!stats) {
-    return <div className="stats-container">No statistics available</div>;
+    return <div>No statistics available</div>;
   }
 
   const { facultyStats, subjectStats, overallStats } = stats;
 
+  const facultyColumns = [
+    {
+      title: 'Faculty Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Lectures',
+      dataIndex: 'lectures',
+      key: 'lectures',
+    },
+    {
+      title: 'Labs',
+      dataIndex: 'labs',
+      key: 'labs',
+    },
+    {
+      title: 'Total',
+      key: 'total',
+      render: (_, record) => record.lectures + record.labs,
+    },
+    {
+      title: 'Subjects',
+      dataIndex: 'subjects',
+      key: 'subjects',
+      render: (subjects) => subjects.join(', '),
+    },
+  ];
+
+  const subjectColumns = [
+    {
+      title: 'Subject Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Lectures',
+      dataIndex: 'lectures',
+      key: 'lectures',
+    },
+    {
+      title: 'Labs',
+      dataIndex: 'labs',
+      key: 'labs',
+    },
+    {
+      title: 'Total',
+      key: 'total',
+      render: (_, record) => record.lectures + record.labs,
+    },
+  ];
+
+  const utilization = ((overallStats.usedSlots / (overallStats.totalSlots - overallStats.breakSlots)) * 100).toFixed(2);
+
   return (
-    <div className="stats-container">
-      <h2>Timetable Statistics</h2>
+    <div>
+      <Title level={3}>Timetable Statistics</Title>
       
-      <div className="overall-stats">
-        <h3>Overall Statistics</h3>
-        <div className="stats-card">
-          <p><strong>Total Slots:</strong> {overallStats.totalSlots}</p>
-          <p><strong>Used Slots:</strong> {overallStats.usedSlots}</p>
-          <p><strong>Free Slots:</strong> {overallStats.freeSlots}</p>
-          <p><strong>Break Slots:</strong> {overallStats.breakSlots}</p>
-          <p><strong>Utilization:</strong> {((overallStats.usedSlots / (overallStats.totalSlots - overallStats.breakSlots)) * 100).toFixed(2)}%</p>
-        </div>
-      </div>
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col span={6}>
+          <Card>
+            <Statistic title="Total Slots" value={overallStats.totalSlots} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic title="Used Slots" value={overallStats.usedSlots} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic title="Free Slots" value={overallStats.freeSlots} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic title="Break Slots" value={overallStats.breakSlots} />
+          </Card>
+        </Col>
+      </Row>
 
-      <div className="faculty-stats">
-        <h3>Faculty Statistics</h3>
-        <div className="stats-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Faculty Name</th>
-                <th>Lectures</th>
-                <th>Labs</th>
-                <th>Total</th>
-                <th>Subjects</th>
-              </tr>
-            </thead>
-            <tbody>
-              {facultyStats.map((faculty, index) => (
-                <tr key={index}>
-                  <td>{faculty.name}</td>
-                  <td>{faculty.lectures}</td>
-                  <td>{faculty.labs}</td>
-                  <td>{faculty.lectures + faculty.labs}</td>
-                  <td>{faculty.subjects.join(', ')}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <Card style={{ marginBottom: 24 }}>
+        <Progress 
+          percent={parseFloat(utilization)} 
+          status="active"
+          format={percent => `Utilization: ${percent}%`}
+        />
+      </Card>
 
-      <div className="subject-stats">
-        <h3>Subject Statistics</h3>
-        <div className="stats-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Subject Name</th>
-                <th>Lectures</th>
-                <th>Labs</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subjectStats.map((subject, index) => (
-                <tr key={index}>
-                  <td>{subject.name}</td>
-                  <td>{subject.lectures}</td>
-                  <td>{subject.labs}</td>
-                  <td>{subject.lectures + subject.labs}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <Card title="Faculty Statistics" style={{ marginBottom: 24 }}>
+        <Table 
+          columns={facultyColumns} 
+          dataSource={facultyStats.map((stat, index) => ({ ...stat, key: index }))}
+          pagination={false}
+        />
+      </Card>
+
+      <Card title="Subject Statistics">
+        <Table 
+          columns={subjectColumns} 
+          dataSource={subjectStats.map((stat, index) => ({ ...stat, key: index }))}
+          pagination={false}
+        />
+      </Card>
     </div>
   );
 }

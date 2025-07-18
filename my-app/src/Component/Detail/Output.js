@@ -1,124 +1,150 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Output.css';
+import React, { useState } from 'react';
+import { Card, Typography, Space, Button, message } from 'antd';
+import { ReloadOutlined, DownloadOutlined, PrinterOutlined } from '@ant-design/icons';
 import TimetableStats from './TimetableStats';
+import Timetable from './Timetable';
+import FreeSlots from './FreeSlots';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
-function Output() {
-  const [timetableData, setTimetableData] = useState(null);
-  const navigate = useNavigate();
+const { Title } = Typography;
 
-  useEffect(() => {
-    // Retrieve timetable data from localStorage
-    const storedData = localStorage.getItem('timetableData');
-    if (storedData) {
-      setTimetableData(JSON.parse(storedData));
-    } else {
-      console.error('No timetable data found in localStorage');
-    }
-  }, []);
+function Output({ timetableData }) {
+  const [localTimetableData, setLocalTimetableData] = useState(timetableData);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleBack = () => {
-    navigate('/');
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    // Simulate a refresh delay
+    setTimeout(() => {
+      setLocalTimetableData(timetableData);
+      setIsRefreshing(false);
+      message.success('Timetable refreshed successfully!');
+    }, 500);
   };
 
   const handlePrint = () => {
     window.print();
   };
 
-  if (!timetableData) {
-    return <div className="loading">Loading timetable data...</div>;
-  }
-
-  const { schedule, stats, freeSlots } = timetableData;
-
-  // Check if schedule is defined
-  if (!schedule) {
-    return <div className="error">No schedule data available.</div>;
-  }
-
-  // Prepare data for display with merged break rows
-  const displayRows = [];
-  
-  schedule.forEach((row, index) => {
-    if (row.time.includes('BREAK')) {
-      // For break rows, create a special row with colspan for all days
-      displayRows.push({
-        time: row.time,
-        isBreak: true
-      });
-    } else {
-      // For regular rows, use the data as is
-      displayRows.push(row);
+  const handleDownloadPDF = () => {
+    if (!localTimetableData || !localTimetableData.schedule) {
+      message.error('No timetable data available to download');
+      return;
     }
-  });
 
-  // Format free slots for display
-  const formatFreeSlots = () => {
-    if (!freeSlots) return "None";
+    const doc = new jsPDF();
     
-    const formattedSlots = [];
-    for (const [day, slots] of Object.entries(freeSlots)) {
-      if (slots && slots.length > 0) {
-        formattedSlots.push(`${day}: ${slots.join(', ')}`);
-      }
-    }
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Generated Timetable', 14, 15);
     
-    return formattedSlots.length > 0 ? formattedSlots.join(' | ') : "None";
+    // Add date
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 25);
+
+    // Prepare table data
+    const tableData = localTimetableData.schedule.map(row => 
+      Object.values(row).map(cell => cell || '')
+    );
+
+    // Add timetable table
+    doc.autoTable({
+      head: [['Time', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']],
+      body: tableData,
+      startY: 35,
+      theme: 'grid',
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+
+    // Add free slots
+    const freeSlotsY = doc.lastAutoTable.finalY + 15;
+    doc.text('Free Slots', 14, freeSlotsY);
+    
+    const freeSlotsData = Object.entries(localTimetableData.freeSlots).map(([day, slots]) => 
+      [day, slots.join(', ')]
+    );
+    
+    doc.autoTable({
+      head: [['Day', 'Free Slots']],
+      body: freeSlotsData,
+      startY: freeSlotsY + 5,
+      theme: 'grid',
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+
+    // Add statistics
+    const statsY = doc.lastAutoTable.finalY + 15;
+    doc.text('Statistics', 14, statsY);
+    
+    const statsData = [
+      ['Total Subjects', localTimetableData.stats.totalSubjects],
+      ['Total Faculty', localTimetableData.stats.totalFaculty],
+      ['Total Hours', localTimetableData.stats.totalHours],
+      ['Lab Subjects', localTimetableData.stats.labSubjects],
+      ['Free Slots', localTimetableData.stats.freeSlots]
+    ];
+    
+    doc.autoTable({
+      body: statsData,
+      startY: statsY + 5,
+      theme: 'grid',
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+
+    // Save the PDF
+    doc.save('timetable.pdf');
+    message.success('Timetable downloaded successfully!');
   };
 
+  if (!localTimetableData) {
+    return (
+      <Card>
+        <Title level={4}>No timetable data available</Title>
+      </Card>
+    );
+  }
+
   return (
-    <div className="output-container">
-      <h2>Generated Timetable</h2>
-      
-      <div className="timetable-wrapper">
-        <table className="timetable">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Monday</th>
-              <th>Tuesday</th>
-              <th>Wednesday</th>
-              <th>Thursday</th>
-              <th>Friday</th>
-              <th>Saturday</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayRows.map((row, rowIndex) => (
-              row.isBreak ? (
-                // Render break row with colspan for all days
-                <tr key={rowIndex} className="break-row">
-                  <td colSpan="7" className="break-cell">{row.time}</td>
-                </tr>
-              ) : (
-                // Render regular row
-                <tr key={rowIndex}>
-                  <td>{row.time}</td>
-                  <td className={row.MON === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.MON === 'FREE SLOT' ? 'FREE SLOT' : row.MON}</td>
-                  <td className={row.TUE === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.TUE === 'FREE SLOT' ? 'FREE SLOT' : row.TUE}</td>
-                  <td className={row.WED === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.WED === 'FREE SLOT' ? 'FREE SLOT' : row.WED}</td>
-                  <td className={row.THU === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.THU === 'FREE SLOT' ? 'FREE SLOT' : row.THU}</td>
-                  <td className={row.FRI === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.FRI === 'FREE SLOT' ? 'FREE SLOT' : row.FRI}</td>
-                  <td className={row.SAT === 'FREE SLOT' ? 'free-slot-cell' : ''}>{row.SAT === 'FREE SLOT' ? 'FREE SLOT' : row.SAT}</td>
-                </tr>
-              )
-            ))}
-          </tbody>
-        </table>
-        
-        <div className="free-slots-summary">
-          <h3>Free Slots</h3>
-          <p>{formatFreeSlots()}</p>
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <Title level={2} style={{ margin: 0 }}>
+            Generated Timetable
+          </Title>
+          <Space>
+            <Button
+              icon={<ReloadOutlined spin={isRefreshing} />}
+              onClick={handleRefresh}
+              loading={isRefreshing}
+            >
+            </Button>
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={handleDownloadPDF}
+            >
+            </Button>
+            <Button
+              icon={<PrinterOutlined />}
+              onClick={handlePrint}
+            >
+            </Button>
+          </Space>
         </div>
-      </div>
-      
-      {stats && <TimetableStats stats={stats} />}
-      
-      <div className="button-group">
-        <button onClick={handleBack} className="back-button">Back to Input</button>
-        <button onClick={handlePrint} className="print-button">Print Timetable</button>
-      </div>
-    </div>
+        <TimetableStats stats={localTimetableData.stats} />
+      </Card>
+
+      <Card>
+        <Timetable schedule={localTimetableData.schedule} />
+      </Card>
+
+      <Card>
+        <FreeSlots freeSlots={localTimetableData.freeSlots} />
+      </Card>
+    </Space>
   );
 }
 

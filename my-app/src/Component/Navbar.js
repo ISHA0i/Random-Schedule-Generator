@@ -1,27 +1,41 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import './CSS/Navbar.css';
+import { Link, useLocation } from 'react-router-dom';
+import { Layout, Menu } from 'antd';
+import { HomeOutlined, ScheduleOutlined } from '@ant-design/icons';
+
+const { Header } = Layout;
 
 function Navbar() {
+  const location = useLocation();
+  
+  const items = [
+    {
+      key: '/input',
+      icon: <HomeOutlined />,
+      label: <Link to="/input">Home</Link>,
+    },
+    {
+      key: '/output',
+      icon: <ScheduleOutlined />,
+      label: <Link to="/output">Schedule</Link>,
+    },
+  ];
+
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">Scheduler App</Link>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <Link className="nav-link active" aria-current="page" to="/">Home</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/detail">Detail</Link>
-            </li>
-          </ul>
-        </div>
+    <Header style={{ position: 'fixed', zIndex: 1, width: '100%', padding: '0 24px' }}>
+      <div style={{ float: 'left', marginRight: '24px' }}>
+        <Link to="/" style={{ color: 'white', fontSize: '18px', fontWeight: 'bold' }}>
+          Scheduler App
+        </Link>
       </div>
-    </nav>
+      <Menu
+        theme="dark"
+        mode="horizontal"
+        selectedKeys={[location.pathname]}
+        items={items}
+        style={{ lineHeight: '64px' }}
+      />
+    </Header>
   );
 }
 
